@@ -139,18 +139,16 @@ export default function Match() {
   //   }
   // };
 
-  const reset = () => {
+  const getResetSegments = () => {
     if (segments == null) {
       return;
     }
 
-    setSegments(
-      segments.map((segment) => ({
-        ...segment,
-        menu: null,
-        squareHighlight: null,
-      })),
-    );
+    return segments.map((segment) => ({
+      ...segment,
+      menu: null,
+      squareHighlight: null,
+    }));
   };
 
   const updateSegment = (
@@ -281,35 +279,38 @@ export default function Match() {
           )}
           <div className="@flex @items-center @justify-center gameInnerBox">
             <div className="gridSize18 mapGrid">
-              {segments.map(({ tile, menu }, index) => {
+              {segments.map(({ tile, menu }, tileIndex) => {
                 const { unit, terrainImage, terrainType, terrainOwner } = tile;
 
                 return (
                   <div
-                    key={index}
+                    key={tileIndex}
                     onClick={() => {
-                      reset();
+                      let newSegments = getResetSegments();
                       if (unit) {
                         // check path
                       } else if (terrainType === 'property') {
                         /* Original functionality for turns; UNCOMMENT ONCE ITS WORKING AGAIN*/
                         /* if (!isTurn(terrainOwner)) {
                           return;
-                        } */
+                        }*/
 
-                        updateSegment(index, (oldSegment) => ({
+                        let oldSegment = newSegments[tileIndex];
+
+                        newSegments[tileIndex] = {
                           ...oldSegment,
                           tile,
                           menu: (
                             <div className="tileMenu">
-                              {factoryBuildableUnits.map((buildable, index) => (
+                              {factoryBuildableUnits.map((buildable, unitIndex) => (
                                 <div
-                                  key={index}
+                                  key={unitIndex}
                                   className="menuOptions" // + menuNoBuy
-                                  onClick={() =>
-                                    buildUnit(index, buildable, terrainOwner)
-                                  }
-                                >
+                                  onClick={(ev) => {
+                                    buildUnit(tileIndex, buildable, terrainOwner);
+                                    ev.stopPropagation();
+                                  }}
+                                  >
                                   <div
                                     className={`menu${terrainOwner}${buildable.menuName}`}
                                   ></div>
@@ -326,7 +327,9 @@ export default function Match() {
                             </div>
                           ),
                           squareHighlight: null,
-                        }));
+                        };
+
+                        setSegments(newSegments);
                       }
                     }}
                     className={`mapTile ${
