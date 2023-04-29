@@ -139,7 +139,7 @@ export default function Match() {
   //   }
   // };
 
-  const getResetSegments = () => {
+  const getResetSegments = () : Segment[] | undefined => {
     if (segments == null) {
       return;
     }
@@ -286,7 +286,12 @@ export default function Match() {
                   <div
                     key={tileIndex}
                     onClick={() => {
-                      let newSegments = getResetSegments();
+                      const newSegments = getResetSegments();
+                      if (newSegments == null)
+                      {
+                        return;
+                      }
+
                       if (unit) {
                         // check path
                       } else if (terrainType === 'property') {
@@ -295,7 +300,7 @@ export default function Match() {
                           return;
                         }*/
 
-                        let oldSegment = newSegments[tileIndex];
+                        const oldSegment = newSegments[tileIndex];
 
                         newSegments[tileIndex] = {
                           ...oldSegment,
